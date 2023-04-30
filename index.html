@@ -9,6 +9,8 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, segoe ui, helvetica neue, helvetica, Cantarell, Ubuntu, roboto, noto, arial, sans-serif;
+      background: hsl(216deg 70% 95%);
+      color: hsl(216deg 70% 5%);
     }
 
     header {
@@ -27,8 +29,45 @@
       gap: 8px;
     }
 
-    form * {
+    label {
+      font-weight: 700;
+    }
+
+    input {
+      font-size: 1rem;
+      margin-block-end: 8px;
+      padding: 8px;
+      border: 1px solid hsl(216deg 70% 50%);
+      border-radius: 4px;
+      transition: filter 600ms;
+    }
+
+    button {
       inline-size: fit-content;
+      font-size: 1rem;
+      padding: 4px 6px;
+      background: hsl(216deg 50% 95%);
+      border: 1px solid hsl(216deg 70% 50%);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: filter 600ms;
+    }
+
+    :is(input, button):is(:hover, :focus-within) {
+      filter: drop-shadow(0 0 2px hsl(216deg 70% 50%));
+      transition: filter 200ms;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
     }
   </style>
 </head>
@@ -51,7 +90,7 @@
 
       <button>Get metadata</button>
 
-      <label for="result">Full JSON metadata</label>
+      <label for="result" class="sr-only">Full JSON metadata</label>
       <output name="result" id="result"></output>
     </form>
   </main>
