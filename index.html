@@ -43,7 +43,8 @@
       font-weight: 700;
     }
 
-    input {
+    input,
+    output {
       font-size: 1rem;
       margin-block-end: 8px;
       padding: 8px;
@@ -63,9 +64,17 @@
       transition: filter 600ms;
     }
 
-    :is(input, button):is(:hover, :focus-within) {
+    :is(input, output, button):is(:hover, :focus-within) {
       filter: drop-shadow(0 0 2px hsl(216deg 70% 50%));
       transition: filter 200ms;
+    }
+
+    output {
+      font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+      background: hsl(216deg 20% 95%);
+      white-space: pre;
+      overflow-x: auto;
+      visibility: hidden;
     }
 
     .sr-only {
@@ -135,10 +144,11 @@
       }
       else {
         const { cidV0, cidV1 } = calculateCID(metadata);
-        output = JSON.stringify(await fetchJSONMetadata(cidV1, ipfs));
+        output = JSON.stringify(await fetchJSONMetadata(cidV1, ipfs), null, 2);
       }
 
       result.textContent = output;
+      result.style.setProperty('visibility', 'visible');
     })
   </script>
 </body>
