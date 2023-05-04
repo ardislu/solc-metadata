@@ -134,12 +134,12 @@
       let output;
       if (metadata.bzzr0 !== undefined) {
         const hex = [...metadata.bzzr0].map(b => b.toString(16).padStart(2, '0')).join('');
-        output = 'Unable to fetch metadata because the smart contract uses a Swarm hash. Swarm hash below:\n';
+        output = 'Unable to fetch metadata because the smart contract uses a Swarm hash:\n';
         output += `bzzr://${hex}`;
       }
       else if (metadata.bzzr1 !== undefined) {
         const hex = [...metadata.bzzr1].map(b => b.toString(16).padStart(2, '0')).join('');
-        output = 'Unable to fetch metadata because the smart contract uses a Swarm hash. Swarm hash below:\n';
+        output = 'Unable to fetch metadata because the smart contract uses a Swarm hash:\n';
         output += `bzz-raw://${hex}`;
       }
       else {
