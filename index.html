@@ -60,11 +60,17 @@
       background: hsl(216deg 50% 95%);
       border: 1px solid hsl(216deg 70% 50%);
       border-radius: 4px;
+      margin-inline-end: 8px;
       cursor: pointer;
       transition: filter 600ms;
     }
 
-    :is(input, output, button):is(:hover, :focus-within) {
+    button:disabled {
+      cursor: not-allowed;
+      border: 1px solid hsl(216deg 70% 75%);
+    }
+
+    :is(input, output, button:not(:disabled)):is(:hover, :focus-within) {
       filter: drop-shadow(0 0 2px hsl(216deg 70% 50%));
       transition: filter 200ms;
     }
@@ -88,6 +94,24 @@
       white-space: nowrap;
       border-width: 0;
     }
+
+    @keyframes spin {
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .inline-spinner {
+      display: inline-block;
+      box-sizing: border-box;
+      block-size: 1em;
+      inline-size: 1em;
+      border: 0.25em solid transparent;
+      border-block-start: 0.25em solid black;
+      border-radius: 50%;
+      animation: spin 1s infinite;
+      visibility: hidden;
+    }
   </style>
 </head>
 
@@ -109,7 +133,10 @@
       <label for="ipfs">IPFS gateway</label>
       <input type="url" name="ipfs" id="ipfs" required value="https://cf-ipfs.com">
 
-      <button>Get metadata</button>
+      <div>
+        <button>Get metadata</button>
+        <span class="inline-spinner"></span>
+      </div>
 
       <label for="result" class="sr-only">Full JSON metadata</label>
       <output name="result" id="result"></output>
@@ -119,6 +146,9 @@
   <script type="module">
     import { fetchBytecode, extractCBOR, decodeCBOR, calculateCID, fetchJSONMetadata } from '/index.js';
 
+    const button = document.querySelector('button');
+    const spinner = document.querySelector('.inline-spinner');
+
     document.querySelector('form').addEventListener('submit', async e => {
       e.preventDefault();
 
@@ -127,6 +157,8 @@
       const rpc = new URL(data.get('rpc'));
       const ipfs = new URL(data.get('ipfs'));
       const result = e.target.elements['result'];
+      button.disabled = true;
+      spinner.style.setProperty('visibility', 'visible');
 
       // Reset the output, if there were previous runs
       result.textContent = '';
@@ -172,7 +204,10 @@
           result.textContent += `❌ Failed to fetch JSON metadata from IPFS CIDv1: ${cidV1}`;
         }
       }
-    })
+
+      button.disabled = false;
+      spinner.style.setProperty('visibility', 'hidden');
+    });
   </script>
 </body>
 
