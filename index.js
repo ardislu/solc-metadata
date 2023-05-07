@@ -149,7 +149,7 @@ function calculateCID(metadata) {
 
   const solcVersion = `${solc[0]}.${solc[1]}.${solc[2]}`;
   const cidV0 = solcMultihashToCIDv0(ipfs);
-  const cidV1 = solcMultihashToCIDv1(ipfs)
+  const cidV1 = solcMultihashToCIDv1(ipfs);
 
   return { solcVersion, cidV0, cidV1 };
 }
