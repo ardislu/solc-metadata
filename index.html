@@ -128,27 +128,50 @@
       const ipfs = new URL(data.get('ipfs'));
       const result = e.target.elements['result'];
 
-      const bytecode = await fetchBytecode(address, rpc);
+      // Reset the output, if there were previous runs
+      result.textContent = '';
+      result.style.setProperty('visibility', 'visible');
+
+      // Retrieve smart contract runtime bytecode
+      let bytecode;
+      try {
+        bytecode = await fetchBytecode(address, rpc);
+        if (bytecode === undefined) { // RPC call succeeded, but address has no bytecode
+          result.textContent += `❌ Failed to fetch runtime bytecode for: ${address}`;
+          return;
+        }
+      }
+      catch { // RPC call failed
+        result.textContent += `❌ Failed to connect to: ${rpc}`;
+        return;
+      }
+      result.textContent += '✅ Successfully fetched runtime bytecode.\n';
+
+      // Parse runtime bytecode
       const cbor = extractCBOR(bytecode);
       const metadata = decodeCBOR(cbor);
-      let output;
+
       if (metadata.bzzr0 !== undefined) {
         const hex = [...metadata.bzzr0].map(b => b.toString(16).padStart(2, '0')).join('');
-        output = 'Unable to fetch metadata because the smart contract uses a Swarm hash:\n';
-        output += `bzzr://${hex}`;
+        result.textContent += 'Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
+        result.textContent += `bzzr://${hex}`;
       }
       else if (metadata.bzzr1 !== undefined) {
         const hex = [...metadata.bzzr1].map(b => b.toString(16).padStart(2, '0')).join('');
-        output = 'Unable to fetch metadata because the smart contract uses a Swarm hash:\n';
-        output += `bzz-raw://${hex}`;
+        result.textContent += 'Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
+        result.textContent += `bzz-raw://${hex}`;
       }
       else {
         const { cidV0, cidV1 } = calculateCID(metadata);
-        output = JSON.stringify(await fetchJSONMetadata(cidV1, ipfs), null, 2);
+        try {
+          const json = await fetchJSONMetadata(cidV1, ipfs);
+          result.textContent += '✅ Successfully fetched JSON metadata.\n\n';
+          result.textContent += JSON.stringify(json, null, 2);
+        }
+        catch {
+          result.textContent += `❌ Failed to fetch JSON metadata from IPFS CIDv1: ${cidV1}`;
+        }
       }
-
-      result.textContent = output;
-      result.style.setProperty('visibility', 'visible');
     })
   </script>
 </body>
