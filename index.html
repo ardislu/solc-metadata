@@ -145,6 +145,7 @@
 
   <script type="module">
     import { fetchBytecode, extractCBOR, decodeCBOR, calculateCID, fetchJSONMetadata } from '/index.js';
+    globalThis.utils = await import('/index.js'); // Make all functions available in DevTools
 
     const button = document.querySelector('button');
     const spinner = document.querySelector('.inline-spinner');
