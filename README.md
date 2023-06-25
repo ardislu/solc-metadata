@@ -12,7 +12,7 @@ By default, the Solidity compiler appends metadata to the end of a smart contrac
 
 ## Extract
 
-After the runtime bytecode is fetched, the metadata may be extracted by reading the last ~53 or so bytes from the end of the runtime bytecode. The exact length will vary depending on the version of `solc` used to compile the bytecode. See the [`solc` docs](https://docs.soliditylang.org/en/v0.8.19/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode) for details about how this metadata is encoded and how exactly to extract the metadata.
+After the runtime bytecode is fetched, the metadata may be extracted by reading the last ~53 or so bytes from the end of the runtime bytecode. The exact length will vary depending on the version of `solc` and the exact compiler settings used to compile the bytecode. See the [`solc` docs](https://docs.soliditylang.org/en/latest/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode) for details about how this metadata is encoded and how exactly to extract the metadata.
 
 ## Decode
 
