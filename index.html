@@ -151,8 +151,8 @@
   </main>
 
   <script type="module">
-    import { fetchBytecode, extractCBOR, decodeCBOR, calculateCID, fetchJSONMetadata } from '/index.js';
-    globalThis.utils = await import('/index.js'); // Make all functions available in DevTools
+    // Make all imported functions available in DevTools, outside this scope
+    Object.assign(globalThis, await import('/index.js'));
 
     const button = document.querySelector('button');
     const spinner = document.querySelector('.inline-spinner');
