@@ -191,36 +191,19 @@
       output.insertAdjacentElement('beforeend', detailsEl);
     }
 
-    document.querySelector('form').addEventListener('submit', async e => {
-      e.preventDefault();
-
-      const data = new FormData(e.target);
-      const address = data.get('address');
-      const rpc = new URL(data.get('rpc'));
-      const ipfs = new URL(data.get('ipfs'));
-      const result = e.target.elements['result'];
-      button.disabled = true;
-      spinner.style.setProperty('visibility', 'visible');
-
-      // Reset the output, if there were previous runs
-      result.innerHTML = '';
-      result.style.setProperty('visibility', 'visible');
-
+    // Business logic with logging
+    async function handleData(address, rpc, ipfs, result) {
       // Retrieve smart contract runtime bytecode
       let bytecode;
       try {
         bytecode = await fetchBytecode(address, rpc);
         if (bytecode === undefined) { // RPC call succeeded, but address has no bytecode
           logOutput(result, '❌ Smart contract address has no runtime bytecode.', address);
-          button.disabled = false;
-          spinner.style.setProperty('visibility', 'hidden');
           return;
         }
       }
       catch { // RPC call failed
         logOutput(result, '❌ Failed to connect to JSON-RPC node.', rpc);
-        button.disabled = false;
-        spinner.style.setProperty('visibility', 'hidden');
         return;
       }
       logOutput(result, '✅ Successfully fetched runtime bytecode.', bytecode);
@@ -229,8 +212,6 @@
       const cbor = extractCBOR(bytecode);
       if (cbor.includes(NaN)) {
         result.insertAdjacentText('beforeend', '❌ Failed to extract CBOR metadata from bytecode.');
-        button.disabled = false;
-        spinner.style.setProperty('visibility', 'hidden');
         return;
       }
       logOutput(result, '✅ Successfully extracted CBOR metadata.', cbor.map(v => v.toString(16).padStart(2, '0')).join(''));
@@ -256,6 +237,25 @@
           logOutput(result, '❌ Failed to fetch JSON metadata from IPFS.', `IPFS node: ${ipfs}`);
         }
       }
+    }
+
+    document.querySelector('form').addEventListener('submit', async e => {
+      e.preventDefault();
+
+      const data = new FormData(e.target);
+      const address = data.get('address');
+      const rpc = new URL(data.get('rpc'));
+      const ipfs = new URL(data.get('ipfs'));
+      const result = e.target.elements['result'];
+
+      button.disabled = true;
+      spinner.style.setProperty('visibility', 'visible');
+
+      // Reset the output, if there were previous runs
+      result.innerHTML = '';
+      result.style.setProperty('visibility', 'visible');
+
+      await handleData(address, rpc, ipfs, result);
 
       button.disabled = false;
       spinner.style.setProperty('visibility', 'hidden');
