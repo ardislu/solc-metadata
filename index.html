@@ -189,20 +189,23 @@
 
       // Parse runtime bytecode
       const cbor = extractCBOR(bytecode);
+      result.textContent += '✅ Successfully extracted CBOR metadata.\n';
       const metadata = decodeCBOR(cbor);
+      result.textContent += '✅ Successfully decoded CBOR metadata.\n';
 
       if (metadata.bzzr0 !== undefined) {
         const hex = [...metadata.bzzr0].map(b => b.toString(16).padStart(2, '0')).join('');
-        result.textContent += 'Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
+        result.textContent += '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
         result.textContent += `bzzr://${hex}`;
       }
       else if (metadata.bzzr1 !== undefined) {
         const hex = [...metadata.bzzr1].map(b => b.toString(16).padStart(2, '0')).join('');
-        result.textContent += 'Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
+        result.textContent += '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
         result.textContent += `bzz-raw://${hex}`;
       }
       else {
         const { cidV0, cidV1 } = calculateCID(metadata);
+        result.textContent += '✅ Successfully calculated IPFS CID.\n';
         try {
           const json = await fetchJSONMetadata(cidV1, ipfs);
           result.textContent += '✅ Successfully fetched JSON metadata.\n\n';
