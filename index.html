@@ -84,10 +84,33 @@
 
     output {
       font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
+      box-sizing: border-box;
+      min-inline-size: 100%;
+      min-block-size: 20ch;
       background: hsl(216deg 20% 95%);
-      white-space: pre;
-      overflow-x: auto;
+      resize: both;
+      white-space: pre-wrap;
+      overflow-wrap: break-word;
       visibility: hidden;
+    }
+
+    details {
+      margin-block: 8px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      background: hsl(216deg 90% 50% / 0.05);
+      transition: background-color 600ms;
+    }
+
+    details:hover,
+    details:focus-within {
+      background: hsl(216deg 90% 50% / 0.1);
+      transition: background-color 200ms;
+    }
+
+    summary {
+      margin-block-end: 4px;
+      cursor: pointer;
     }
 
     .sr-only {
@@ -157,6 +180,16 @@
     const button = document.querySelector('button');
     const spinner = document.querySelector('.inline-spinner');
 
+    // Inject <details> element into output
+    function logOutput(output, summary, details) {
+      const summaryEl = document.createElement('summary');
+      summaryEl.textContent = summary;
+      const detailsEl = document.createElement('details');
+      detailsEl.insertAdjacentElement('beforeend', summaryEl);
+      detailsEl.insertAdjacentText('beforeend', details);
+      output.insertAdjacentElement('beforeend', detailsEl);
+    }
+
     document.querySelector('form').addEventListener('submit', async e => {
       e.preventDefault();
 
@@ -169,7 +202,7 @@
       spinner.style.setProperty('visibility', 'visible');
 
       // Reset the output, if there were previous runs
-      result.textContent = '';
+      result.innerHTML = '';
       result.style.setProperty('visibility', 'visible');
 
       // Retrieve smart contract runtime bytecode
@@ -177,42 +210,39 @@
       try {
         bytecode = await fetchBytecode(address, rpc);
         if (bytecode === undefined) { // RPC call succeeded, but address has no bytecode
-          result.textContent += `❌ Failed to fetch runtime bytecode for: ${address}`;
+          logOutput(result, '❌ Smart contract address has no runtime bytecode.', address);
           return;
         }
       }
       catch { // RPC call failed
-        result.textContent += `❌ Failed to connect to: ${rpc}`;
+        logOutput(result, '❌ Failed to connect to JSON-RPC node.', rpc);
         return;
       }
-      result.textContent += '✅ Successfully fetched runtime bytecode.\n';
+      logOutput(result, '✅ Successfully fetched runtime bytecode.', bytecode);
 
       // Parse runtime bytecode
       const cbor = extractCBOR(bytecode);
-      result.textContent += '✅ Successfully extracted CBOR metadata.\n';
+      logOutput(result, '✅ Successfully extracted CBOR metadata.', cbor.map(v => v.toString(16).padStart(2, '0')).join(''));
       const metadata = decodeCBOR(cbor);
-      result.textContent += '✅ Successfully decoded CBOR metadata.\n';
+      logOutput(result, '✅ Successfully decoded CBOR metadata.', JSON.stringify(metadata, null, 2));
 
       if (metadata.bzzr0 !== undefined) {
         const hex = [...metadata.bzzr0].map(b => b.toString(16).padStart(2, '0')).join('');
-        result.textContent += '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
-        result.textContent += `bzzr://${hex}`;
+        logOutput(result, '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash.', `bzzr://${hex}`);
       }
       else if (metadata.bzzr1 !== undefined) {
         const hex = [...metadata.bzzr1].map(b => b.toString(16).padStart(2, '0')).join('');
-        result.textContent += '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash:\n';
-        result.textContent += `bzz-raw://${hex}`;
+        logOutput(result, '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash.', `bzz-raw://${hex}`);
       }
       else {
         const { cidV0, cidV1 } = calculateCID(metadata);
-        result.textContent += '✅ Successfully calculated IPFS CID.\n';
+        logOutput(result, '✅ Successfully calculated IPFS CID.', `IPFS CIDv0: ${cidV0}\nIPFS CIDv1: ${cidV1}`);
         try {
           const json = await fetchJSONMetadata(cidV1, ipfs);
-          result.textContent += '✅ Successfully fetched JSON metadata.\n\n';
-          result.textContent += JSON.stringify(json, null, 2);
+          logOutput(result, '✅ Successfully fetched JSON metadata.', JSON.stringify(json, null, 2));
         }
         catch {
-          result.textContent += `❌ Failed to fetch JSON metadata from IPFS CIDv1: ${cidV1}`;
+          logOutput(result, '❌ Failed to fetch JSON metadata from IPFS.', `IPFS node: ${ipfs}`);
         }
       }
 
