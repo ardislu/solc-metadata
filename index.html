@@ -212,11 +212,15 @@
         bytecode = await fetchBytecode(address, rpc);
         if (bytecode === undefined) { // RPC call succeeded, but address has no bytecode
           logOutput(result, '❌ Smart contract address has no runtime bytecode.', address);
+          button.disabled = false;
+          spinner.style.setProperty('visibility', 'hidden');
           return;
         }
       }
       catch { // RPC call failed
         logOutput(result, '❌ Failed to connect to JSON-RPC node.', rpc);
+        button.disabled = false;
+        spinner.style.setProperty('visibility', 'hidden');
         return;
       }
       logOutput(result, '✅ Successfully fetched runtime bytecode.', bytecode);
