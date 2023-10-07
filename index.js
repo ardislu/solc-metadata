@@ -17,12 +17,13 @@ async function fetchBytecode(address, rpc) {
     .then(obj => obj.result);
 }
 
-function extractCBOR(bytecode) {
+function extractCBOR(bytecode, lang = 'solidity') {
   // The length of the CBOR will always be stored as the last two bytes of the runtime bytecode
   const cborLen = parseInt(bytecode.slice(-4), 16);
 
   // Derive the CBOR by counting backwards from the end (minus the last two bytes)
-  const cbor = bytecode.substring(bytecode.length - 4 - cborLen * 2, bytecode.length - 4);
+  // IMPORTANT: Vyper INCLUDES the last two bytes in the byte length, unlike Solidity!
+  const cbor = bytecode.substring(bytecode.length - (lang === 'solidity' ? 4 : 0) - cborLen * 2, bytecode.length - 4);
 
   // Convert to a byte array for easier use in subsequent processing
   const byteArray = cbor.match(/.{2}/g).map(v => parseInt(v, 16));
