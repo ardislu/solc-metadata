@@ -155,7 +155,7 @@ function calculateCID(metadata) {
   return { solcVersion, cidV0, cidV1 };
 }
 
-function fetchJSONMetadata(cid, ipfs) {
+function fetchCID(cid, ipfs) {
   let response;
   if (cid[0] === 'Q') { // v0
     response = fetch(`${ipfs.origin}/ipfs/${cid}${ipfs.search}`);
@@ -168,7 +168,7 @@ function fetchJSONMetadata(cid, ipfs) {
       response = fetch(`${ipfs.protocol}//${cid}.ipfs.${ipfs.host}${ipfs.pathname}${ipfs.search}`);
     }
   }
-  return response.then(r => r.json());
+  return response;
 }
 
-export { fetchBytecode, extractCBOR, decodeCBOR, calculateCID, fetchJSONMetadata };
+export { fetchBytecode, extractCBOR, decodeCBOR, calculateCID, fetchCID };

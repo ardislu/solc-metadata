@@ -220,6 +220,8 @@
       const metadata = decodeCBOR(cbor);
       logOutput(result, '✅ Successfully decoded CBOR metadata.', JSON.stringify(metadata, null, 2));
 
+      // Fetch JSON metadata
+      let json;
       if (metadata.bzzr0 !== undefined) {
         const hex = [...metadata.bzzr0].map(b => b.toString(16).padStart(2, '0')).join('');
         logOutput(result, '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash.', `bzzr://${hex}`);
@@ -232,11 +234,25 @@
         const { cidV0, cidV1 } = calculateCID(metadata);
         logOutput(result, '✅ Successfully calculated IPFS CID.', `IPFS CIDv0: ${cidV0}\nIPFS CIDv1: ${cidV1}`);
         try {
-          const json = await fetchJSONMetadata(cidV1, ipfs);
+          json = await fetchCID(cidV1, ipfs).then(r => r.json());
           logOutput(result, '✅ Successfully fetched JSON metadata.', JSON.stringify(json, null, 2));
         }
         catch {
           logOutput(result, '❌ Failed to fetch JSON metadata from IPFS.', `IPFS node: ${ipfs}`);
+        }
+      }
+
+      // Fetch source code
+      if (json?.sources !== undefined) {
+        for (const [file, source] of Object.entries(json.sources)) {
+          try {
+            const cidV0 = source.urls[1].substring(11);
+            const code = await fetchCID(cidV0, ipfs).then(r => r.text());
+            logOutput(result, `✅ Successfully fetched source code for "${file}" from IPFS.`, code);
+          }
+          catch {
+            logOutput(result, `❌ Failed to fetch source code for "${file}" from IPFS.`, `IPFS node: ${ipfs}`);
+          }
         }
       }
     }
