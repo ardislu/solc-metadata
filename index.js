@@ -1,3 +1,10 @@
+/**
+ * Wrapper around the `fetch` API to simplify making an `eth_getCode` JSON-RPC call.
+ * @param {string} address Hex address of the smart contract to retrieve the bytecode for (including `0x` prefix).
+ * @param {string} rpc URL for a node that supports the standard Ethereum JSON-RPC method `eth_getCode`.
+ * @returns {Promise<string|undefined>} `Promise` that will resolve to the `string` bytecode for the address, or `undefined` if the address is malformed.
+ * @throws {TypeError} Will throw an error if the RPC responds with an HTTP error.
+ */
 async function fetchBytecode(address, rpc) {
   // Will work on all blockchains that support the standard Ethereum JSON-RPC method 'eth_getCode'
   return fetch(rpc, {
@@ -17,6 +24,13 @@ async function fetchBytecode(address, rpc) {
     .then(obj => obj.result);
 }
 
+/**
+ * Parse arbitrary EVM bytecode to extract the bytecode metadata from it.
+ * @param {string} bytecode Raw EVM bytecode in hex (including `0x` prefix).
+ * @param {'solidity'|'vyper'} [lang=solidity] Smart contract language used to compile this bytecode.
+ * @returns {Array<number>} Byte array of the CBOR-encoded bytecode metadata.
+ * @throws {TypeError} Will throw an error if the bytecode is malformed.
+ */
 function extractCBOR(bytecode, lang = 'solidity') {
   // The length of the CBOR will always be stored as the last two bytes of the runtime bytecode
   const cborLen = parseInt(bytecode.slice(-4), 16);
@@ -31,6 +45,11 @@ function extractCBOR(bytecode, lang = 'solidity') {
   return byteArray;
 }
 
+/**
+ * Decode `solc`-encoded CBOR metadata. This is **not a full CBOR decoder**, it can only handle metadata from `solc`.
+ * @param {Array<number>} cbor Byte array of CBOR-encoded data.
+ * @returns {Object} `Object` representing the decoded CBOR data.
+ */
 function decodeCBOR(cbor) {
   const decoder = new TextDecoder();
 
@@ -83,8 +102,13 @@ function decodeCBOR(cbor) {
   return output;
 }
 
-// The IPFS v0 CID is the base58btc-encoded multihash, where the multihash is of the sha256 hash of the dag-pb representation of the metadata
+/**
+ * Transform a SHA-256 hash into an IPFS CIDv0, which is a base58btc-encoded multihash.
+ * @param {Array<number>} byteArray A byte array representing a SHA-256 hash.
+ * @returns {string} An IPFS CIDv0 (starts with `Q`) for a SHA-256 hash.
+ */
 function solcMultihashToCIDv0(byteArray) {
+  // The IPFS v0 CID is the base58btc-encoded multihash, where the multihash is of the sha256 hash of the dag-pb representation of the metadata
   const output = [];
 
   // Base58 conversion logic is copied from https://github.com/cryptocoinjs/base-x
@@ -109,7 +133,12 @@ function solcMultihashToCIDv0(byteArray) {
   return output.map(b => alphabet.charAt(b)).join('');
 }
 
-// The IPFS v1 CID is a self-describing format that may encode many combinations of hash and content
+/**
+ * Transform a SHA-256 hash into an IPFS CIDv1, which is a self-describing format that may encode many combinations of hash and content.
+ * This function will base32-encode the hash.
+ * @param {Array<number>} byteArray A byte array representing a SHA-256 hash.
+ * @returns {string} An IPFS CIDv1 (starts with `b`) for a SHA-256 hash.
+ */
 function solcMultihashToCIDv1(byteArray) {
   // The CIDv1 format includes multiple parts so the format can be flexible and self-describing for many combinations
   // of encoding, version, hash function, length, etc. However, all these parts are already chosen by solc and then
@@ -145,6 +174,11 @@ function solcMultihashToCIDv1(byteArray) {
   return `${prefix}${out}`;
 }
 
+/**
+ * Get IPFS CIDs for the JSON metadata file from decoded bytecode metadata.
+ * @param {Object} metadata Decoded bytecode metadata.
+ * @returns {Object} The `solc` compiler version and IPFS CIDs (both CIDv0 and CIDv1) of the JSON metadata.
+ */
 function calculateCID(metadata) {
   const { ipfs, solc } = metadata;
 
@@ -155,6 +189,12 @@ function calculateCID(metadata) {
   return { solcVersion, cidV0, cidV1 };
 }
 
+/**
+ * Wrapper around the `fetch` API to simplify querying an IPFS node for a CID. 
+ * @param {string} cid An IPFS CID.
+ * @param {string} ipfs URL for an IPFS node.
+ * @returns {Promise<Response>} `Promise` that resolves to a `Response` object.
+ */
 function fetchCID(cid, ipfs) {
   let response;
   if (cid[0] === 'Q') { // v0
