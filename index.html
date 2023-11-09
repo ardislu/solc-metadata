@@ -73,14 +73,19 @@
       transition: filter 600ms;
     }
 
-    button:disabled {
+    [data-submitting] button {
       cursor: not-allowed;
       border: 1px solid hsl(216deg 70% 75%);
     }
 
-    :is(input, output, button:not(:disabled)):is(:hover, :focus-within) {
+    :is(input, output, button):is(:hover, :focus-within) {
       filter: drop-shadow(0 0 2px hsl(216deg 70% 50%));
       transition: filter 200ms;
+    }
+
+    [data-submitting] button:is(:hover, :focus-within) {
+      filter: unset;
+      transition: unset;
     }
 
     output {
@@ -261,14 +266,17 @@
     document.querySelector('form').addEventListener('submit', async e => {
       e.preventDefault();
 
+      if (e.target.hasAttribute('data-submitting')) {
+        return;
+      }
+      e.target.setAttribute('data-submitting', '');
+      spinner.style.setProperty('visibility', 'visible');
+
       const data = new FormData(e.target);
       const address = data.get('address');
       const rpc = new URL(data.get('rpc'));
       const ipfs = new URL(data.get('ipfs'));
       const result = e.target.elements['result'];
-
-      button.disabled = true;
-      spinner.style.setProperty('visibility', 'visible');
 
       // Reset the output, if there were previous runs
       result.innerHTML = '';
@@ -276,8 +284,8 @@
 
       await handleData(address, rpc, ipfs, result);
 
-      button.disabled = false;
       spinner.style.setProperty('visibility', 'hidden');
+      e.target.removeAttribute('data-submitting');
     });
   </script>
 </body>
