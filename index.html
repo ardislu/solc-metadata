@@ -73,17 +73,14 @@
       transition: filter 600ms;
     }
 
-    [data-submitting] button {
-      cursor: not-allowed;
-      border: 1px solid hsl(216deg 70% 75%);
-    }
-
     :is(input, output, button):is(:hover, :focus-within) {
       filter: drop-shadow(0 0 2px hsl(216deg 70% 50%));
       transition: filter 200ms;
     }
 
-    [data-submitting] button:is(:hover, :focus-within) {
+    [data-submitting] button {
+      cursor: not-allowed;
+      border: 1px solid hsl(216deg 70% 75%);
       filter: unset;
       transition: unset;
     }
