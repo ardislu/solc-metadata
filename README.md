@@ -4,6 +4,9 @@ This is the minimum JavaScript required to fetch, extract, decode, and use the [
 
 Similar to sourcify's metadata playground ([website](https://playground.sourcify.dev/), [GitHub](https://github.com/sourcifyeth/metadata-playground)) but reduced to the bare minimum code.
 
+> [!WARNING]<br>
+> This tool does not validate the source code retrieved from the bytecode metadata. You **MUST** recompile the source code and match it with the on-chain bytecode to confirm the metadata is correct.
+
 ## Fetch
 
 By default, the Solidity compiler appends metadata to the end of a smart contract's runtime bytecode. A smart contract's runtime bytecode may be fetched from any Ethereum node using the standard JSON-RPC method [`eth_getCode`](https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getcode).
