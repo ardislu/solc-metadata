@@ -40,3 +40,11 @@ The table above was created by researching the [`solc` changelog](https://github
 Once the CID is calculated, you may finally use the CID to retrieve the full JSON metadata from IPFS (assuming someone has pinned the JSON file in IPFS).
 
 If the smart contract was compiled using an old version of `solc` (before `v0.6.0`), then the metadata may only contain `bzzr0` or `bzzr1` keys. In this case, the tool is unable to fetch the metadata because there are no easily accessible public Swarm gateways, and it's unlikely the metadata is still hosted anyway.
+
+## TypeScript
+
+`index.d.ts` is generated from the [JSDoc](https://jsdoc.app/) comments in `index.js` using `tsc`:
+
+```
+tsc --declaration --emitDeclarationOnly --allowJs ./index.js
+```
