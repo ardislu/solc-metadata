@@ -242,7 +242,7 @@
           logOutput(result, '✅ Successfully fetched JSON metadata.', JSON.stringify(json, null, 2));
         }
         catch {
-          logOutput(result, '❌ Failed to fetch JSON metadata from IPFS.', `IPFS node: ${ipfs}`);
+          logOutput(result, '❌ Failed to fetch JSON metadata.', `IPFS node: ${ipfs}`);
         }
       }
 
@@ -252,10 +252,10 @@
           try {
             const cidV0 = source.urls[1].substring(11);
             const code = await fetchCID(cidV0, ipfs).then(r => r.text());
-            logOutput(result, `✅ Successfully fetched source code for "${file}" from IPFS.`, code);
+            logOutput(result, `✅ Successfully fetched source code for "${file}".`, code);
           }
           catch {
-            logOutput(result, `❌ Failed to fetch source code for "${file}" from IPFS.`, `IPFS node: ${ipfs}`);
+            logOutput(result, `❌ Failed to fetch source code for "${file}".`, `IPFS node: ${ipfs}`);
           }
         }
       }
