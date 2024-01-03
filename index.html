@@ -215,6 +215,13 @@
       }
       logOutput(result, '✅ Successfully fetched runtime bytecode.', bytecode);
 
+      // Validate smart contract language used
+      const lang = detectLanguage(bytecode);
+      if (lang !== 'solidity') {
+        logOutput(result, '❌ Unsupported smart contract language.', `Language detected: ${lang}`);
+        return;
+      }
+
       // Parse runtime bytecode
       const cbor = extractCBOR(bytecode);
       if (cbor.includes(NaN)) {

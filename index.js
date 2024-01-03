@@ -25,6 +25,27 @@ async function fetchBytecode(address, rpc) {
 }
 
 /**
+ * Determine the smart contract language used to produce a smart contract by inspecting the initial bytes
+ * of the runtime bytecode.
+ * @param {string} bytecode Runtime bytecode of a smart contract.
+ * @returns {'solidity'|'vyper'|'unknown'} The smart contract language used to generate this smart contract.
+ */
+function detectLanguage(bytecode) {
+  const prefix = bytecode.replace('0x', '').substring(0, 10);
+
+  // https://github.com/banteg/erigon-kv/blob/5584ada83c75b244e611641d100ccc647a7f6791/examples/compilers.py#L17
+  if (prefix === '6060604052' || prefix === '6080604052') {
+    return 'solidity';
+  }
+  else if (prefix === '6004361015' || prefix === '341561000a') {
+    return 'vyper';
+  }
+  else {
+    return 'unknown';
+  }
+}
+
+/**
  * Parse arbitrary EVM bytecode to extract the bytecode metadata from it.
  * @param {string} bytecode Raw EVM bytecode in hex (including `0x` prefix).
  * @param {'solidity'|'vyper'} [lang=solidity] Smart contract language used to compile this bytecode.
@@ -211,4 +232,4 @@ function fetchCID(cid, ipfs) {
   return response;
 }
 
-export { fetchBytecode, extractCBOR, decodeCBOR, calculateCID, fetchCID };
+export { fetchBytecode, detectLanguage, extractCBOR, decodeCBOR, calculateCID, fetchCID };

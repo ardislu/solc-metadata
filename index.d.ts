@@ -7,6 +7,13 @@
  */
 export function fetchBytecode(address: string, rpc: string): Promise<string | undefined>;
 /**
+ * Determine the smart contract language used to produce a smart contract by inspecting the initial bytes
+ * of the runtime bytecode.
+ * @param {string} bytecode Runtime bytecode of a smart contract.
+ * @returns {'solidity'|'vyper'|'unknown'} The smart contract language used to generate this smart contract.
+ */
+export function detectLanguage(bytecode: string): 'solidity' | 'vyper' | 'unknown';
+/**
  * Parse arbitrary EVM bytecode to extract the bytecode metadata from it.
  * @param {string} bytecode Raw EVM bytecode in hex (including `0x` prefix).
  * @param {'solidity'|'vyper'} [lang=solidity] Smart contract language used to compile this bytecode.
