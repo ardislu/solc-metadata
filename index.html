@@ -46,6 +46,16 @@
       text-decoration: underline;
     }
 
+    .help {
+      transition: filter 600ms;
+    }
+
+    .help:hover,
+    .help:focus {
+      filter: drop-shadow(0 0 8px hsl(216deg 50% 70%));
+      transition: filter 200ms;
+    }
+
     .help>svg {
       block-size: 100%;
     }
