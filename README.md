@@ -23,7 +23,7 @@ The metadata in the runtime bytecode is [CBOR (Concise Binary Object Representat
 
 ## Use
 
-Here are the possible keys that `solc` may encode into the bytecode (as of `v0.8.19`):
+Here are the possible keys that `solc` may encode into the bytecode (as of `v0.8.24`):
 
 | Key            | Description                                                 | Included in `solc` versions   |
 | -------------- | ----------------------------------------------------------- | ----------------------------- |
@@ -33,7 +33,7 @@ Here are the possible keys that `solc` may encode into the bytecode (as of `v0.8
 | `ipfs`         | IPFS hash (not a CID) of the full metadata JSON             | `0.6.0` and above             |
 | `experimental` | `bool` indicating if experimental `solc` features were used | `0.4.16` and above            |
 
-The table above was created by researching the [`solc` changelog](https://github.com/ethereum/solidity/blob/develop/Changelog.md) and archived versions of the [official `solc` documentation](https://docs.soliditylang.org/en/v0.8.19/metadata.html). Check the changelog and the documentation for the latest details.
+The table above was created by researching the [`solc` changelog](https://github.com/ethereum/solidity/blob/develop/Changelog.md) and archived versions of the [official `solc` documentation](https://docs.soliditylang.org/en/v0.8.24/metadata.html). Check the changelog and the documentation for the latest details.
 
 **The `ipfs` value in the decoded metadata is not a CID**. It's a [multihash](https://github.com/multiformats/multihash) of the `sha256` hash of the full JSON metadata file. The multihash must be converted into a [CID](https://docs.ipfs.tech/concepts/content-addressing/) to be usable. Minimal transformation functions are implemented to convert the multihash into both CIDv0 and CIDv1.
 
