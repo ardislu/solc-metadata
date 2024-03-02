@@ -1,6 +1,6 @@
 # solc-metadata
 
-This is the minimum JavaScript required to fetch, extract, decode, and use the [metadata](https://docs.soliditylang.org/en/latest/metadata.html) that the Solidity compiler ([solc](https://github.com/ethereum/solidity/releases)) appends to the end of a smart contract's runtime bytecode.
+This is the minimum JavaScript required to fetch, extract, decode, and use the [metadata (or "auxdata")](https://docs.soliditylang.org/en/latest/metadata.html) that the Solidity compiler ([solc](https://github.com/ethereum/solidity/releases)) appends to the end of a smart contract's runtime bytecode.
 
 Similar to sourcify's metadata playground ([website](https://playground.sourcify.dev/), [GitHub](https://github.com/sourcifyeth/metadata-playground)) but reduced to the bare minimum code.
 
@@ -15,7 +15,7 @@ By default, the Solidity compiler appends metadata to the end of a smart contrac
 
 ## Extract
 
-After the runtime bytecode is fetched, the metadata may be extracted by reading the last ~53 or so bytes from the end of the runtime bytecode. The exact length will vary depending on the version of `solc` and the exact compiler settings used to compile the bytecode. See the [`solc` docs](https://docs.soliditylang.org/en/latest/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode) for details about how this metadata is encoded and how exactly to extract the metadata.
+After the runtime bytecode is fetched, the metadata (or "auxdata") may be extracted by reading the last ~53 or so bytes from the end of the runtime bytecode. The exact length will vary depending on the version of `solc` and the exact compiler settings used to compile the bytecode. See the [`solc` docs](https://docs.soliditylang.org/en/latest/metadata.html#encoding-of-the-metadata-hash-in-the-bytecode) for details about how this metadata is encoded and how exactly to extract the metadata.
 
 ## Decode
 
