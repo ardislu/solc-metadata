@@ -300,6 +300,13 @@
       // Fetch source code
       if (json?.sources !== undefined) {
         for (const [file, source] of Object.entries(json.sources)) {
+          // Source code is literal within the metadata file (i.e., compiler option "useLiteralContent: true")
+          if (source?.content !== undefined) {
+            const code = source.content;
+            logOutput(result, `✅ Successfully fetched source code for "${file}".`, code);
+            continue;
+          }
+          // Source code is linked within metadata file via IPFS
           try {
             const cidV0 = source.urls[1].substring(11);
             const code = await fetchCID(cidV0, ipfs).then(r => r.text());
