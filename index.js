@@ -213,7 +213,7 @@ function calculateCID(metadata) {
 /**
  * Wrapper around the `fetch` API to simplify querying an IPFS node for a CID. 
  * @param {string} cid An IPFS CID.
- * @param {string} ipfs URL for an IPFS node.
+ * @param {URL} ipfs URL for an IPFS node.
  * @returns {Promise<Response>} `Promise` that resolves to a `Response` object.
  */
 function fetchCID(cid, ipfs) {

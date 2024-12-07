@@ -12,7 +12,7 @@ export function fetchBytecode(address: string, rpc: string): Promise<string | un
  * @param {string} bytecode Runtime bytecode of a smart contract.
  * @returns {'solidity'|'vyper'|'unknown'} The smart contract language used to generate this smart contract.
  */
-export function detectLanguage(bytecode: string): 'solidity' | 'vyper' | 'unknown';
+export function detectLanguage(bytecode: string): "solidity" | "vyper" | "unknown";
 /**
  * Parse arbitrary EVM bytecode to extract the bytecode metadata from it.
  * @param {string} bytecode Raw EVM bytecode in hex (including `0x` prefix).
@@ -20,7 +20,7 @@ export function detectLanguage(bytecode: string): 'solidity' | 'vyper' | 'unknow
  * @returns {Array<number>} Byte array of the CBOR-encoded bytecode metadata.
  * @throws {TypeError} Will throw an error if the bytecode is malformed.
  */
-export function extractCBOR(bytecode: string, lang?: 'solidity' | 'vyper'): Array<number>;
+export function extractCBOR(bytecode: string, lang?: "solidity" | "vyper"): Array<number>;
 /**
  * Decode `solc`-encoded CBOR metadata. This is **not a full CBOR decoder**, it can only handle metadata from `solc`.
  * @param {Array<number>} cbor Byte array of CBOR-encoded data.
@@ -36,7 +36,7 @@ export function calculateCID(metadata: any): any;
 /**
  * Wrapper around the `fetch` API to simplify querying an IPFS node for a CID.
  * @param {string} cid An IPFS CID.
- * @param {string} ipfs URL for an IPFS node.
+ * @param {URL} ipfs URL for an IPFS node.
  * @returns {Promise<Response>} `Promise` that resolves to a `Response` object.
  */
-export function fetchCID(cid: string, ipfs: string): Promise<Response>;
+export function fetchCID(cid: string, ipfs: URL): Promise<Response>;
