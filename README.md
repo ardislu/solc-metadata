@@ -7,6 +7,8 @@ Similar to sourcify's metadata playground ([website](https://playground.sourcify
 > [!WARNING]<br>
 > This tool does not validate the source code retrieved from the bytecode metadata. You **MUST** recompile the source code and match it with the on-chain bytecode to confirm the metadata is correct.
 
+Code repository mirrors: [GitHub](https://github.com/ardislu/solc-metadata), [Codeberg](https://codeberg.org/ardislu/solc-metadata), [git.ardis.lu](https://git.ardis.lu/solc-metadata)
+
 ## Fetch
 
 By default, the Solidity compiler appends metadata to the end of a smart contract's runtime bytecode. A smart contract's runtime bytecode may be fetched from any Ethereum node using the standard JSON-RPC method [`eth_getCode`](https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_getcode).
