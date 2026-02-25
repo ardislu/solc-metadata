@@ -275,7 +275,7 @@
         result.insertAdjacentText('beforeend', '❌ Failed to extract CBOR metadata from bytecode.');
         return;
       }
-      logOutput(result, '✅ Successfully extracted CBOR metadata.', cbor.map(v => v.toString(16).padStart(2, '0')).join(''));
+      logOutput(result, '✅ Successfully extracted CBOR metadata.', cbor.toHex());
       const metadata = decodeCBOR(cbor);
       // Minimal replacer to convert byte array values to CBOR diagnostic format.
       const replacer = (_, v) => ArrayBuffer.isView(v) ? `h'${v.toHex()}'` : v;
@@ -284,11 +284,11 @@
       // Fetch JSON metadata
       let json;
       if (metadata.bzzr0 !== undefined) {
-        const hex = [...metadata.bzzr0].map(b => b.toString(16).padStart(2, '0')).join('');
+        const hex = metadata.bzzr0.toHex();
         logOutput(result, '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash.', `bzzr://${hex}`);
       }
       else if (metadata.bzzr1 !== undefined) {
-        const hex = [...metadata.bzzr1].map(b => b.toString(16).padStart(2, '0')).join('');
+        const hex = metadata.bzzr1.toHex();
         logOutput(result, '❌ Unable to fetch JSON metadata because the smart contract uses a Swarm hash.', `bzz-raw://${hex}`);
       }
       else {
