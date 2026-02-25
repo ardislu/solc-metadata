@@ -277,7 +277,9 @@
       }
       logOutput(result, '✅ Successfully extracted CBOR metadata.', cbor.map(v => v.toString(16).padStart(2, '0')).join(''));
       const metadata = decodeCBOR(cbor);
-      logOutput(result, '✅ Successfully decoded CBOR metadata.', JSON.stringify(metadata, null, 2));
+      // Minimal replacer to convert byte array values to CBOR diagnostic format.
+      const replacer = (_, v) => ArrayBuffer.isView(v) ? `h'${v.toHex()}'` : v;
+      logOutput(result, '✅ Successfully decoded CBOR metadata.', JSON.stringify(metadata, replacer, 2));
 
       // Fetch JSON metadata
       let json;
