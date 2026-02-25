@@ -195,9 +195,22 @@ function solcMultihashToCIDv1(byteArray) {
 }
 
 /**
+ * @typedef {Object} BytecodeMetadata
+ * @property {Uint8Array} ipfs Byte array of a multihash of the SHA-256 hash of the full JSON metadata file.
+ * @property {Uint8Array} solc Byte array of the literal Solidity version number.
+ */
+
+/**
+ * @typedef {Object} CIDs
+ * @property {string} solcVersion String representation of the Solidity version number used.
+ * @property {string} cidV0 A CID V0 that can be directly used to look up the JSON metadata file on IPFS.
+ * @property {string} cidV1 A CID V1 that can be directly used to look up the JSON metadata file on IPFS.
+ */
+
+/**
  * Get IPFS CIDs for the JSON metadata file from decoded bytecode metadata.
- * @param {Object} metadata Decoded bytecode metadata.
- * @returns {Object} The `solc` compiler version and IPFS CIDs (both CIDv0 and CIDv1) of the JSON metadata.
+ * @param {BytecodeMetadata} metadata Decoded bytecode metadata.
+ * @returns {CIDs} The `solc` compiler version and IPFS CIDs (both CIDv0 and CIDv1) of the JSON metadata.
  */
 function calculateCID(metadata) {
   const { ipfs, solc } = metadata;
