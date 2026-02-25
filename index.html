@@ -267,8 +267,11 @@
       }
 
       // Parse runtime bytecode
-      const cbor = extractCBOR(bytecode);
-      if (cbor.includes(NaN)) {
+      let cbor;
+      try {
+        cbor = extractCBOR(bytecode);
+      }
+      catch {
         result.insertAdjacentText('beforeend', '❌ Failed to extract CBOR metadata from bytecode.');
         return;
       }

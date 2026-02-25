@@ -49,7 +49,7 @@ function detectLanguage(bytecode) {
  * Parse arbitrary EVM bytecode to extract the bytecode metadata from it.
  * @param {string} bytecode Raw EVM bytecode in hex.
  * @param {'solidity'|'vyper'} [lang=solidity] Smart contract language used to compile this bytecode.
- * @returns {Array<number>} Byte array of the CBOR-encoded bytecode metadata.
+ * @returns {Uint8Array} Byte array of the CBOR-encoded bytecode metadata.
  * @throws {TypeError} Will throw an error if the bytecode is malformed.
  */
 function extractCBOR(bytecode, lang = 'solidity') {
@@ -62,49 +62,44 @@ function extractCBOR(bytecode, lang = 'solidity') {
   // IMPORTANT: Vyper INCLUDES the last two bytes in the byte length, unlike Solidity!
   const cbor = bytecode.substring(bytecode.length - (lang === 'solidity' ? 4 : 0) - cborLen * 2, bytecode.length - 4);
 
-  // Convert to a byte array for easier use in subsequent processing
-  const byteArray = cbor.match(/.{2}/g).map(v => parseInt(v, 16));
-
-  return byteArray;
+  return Uint8Array.fromHex(cbor);
 }
 
 /**
  * Decode `solc`-encoded CBOR metadata. This is **not a full CBOR decoder**, it can only handle metadata from `solc`.
- * @param {Array<number>} cbor Byte array of CBOR-encoded data.
+ * @param {Uint8Array} cbor Byte array of CBOR-encoded data.
  * @returns {Object} `Object` representing the decoded CBOR data.
  */
 function decodeCBOR(cbor) {
   const decoder = new TextDecoder();
 
-  // Assume the first byte initializes a map structure. The size is not used because it's not required for objects in JavaScript.
-  cbor.shift();
   const output = {};
 
   let isKey = true; // Alternate between key and property after each structure is processed
   let lastStructure = null; // To set the property for the last key that was set
-  while (cbor.length > 0) {
-    const byte = cbor.shift();
+  for (let i = 1; i < cbor.length; i++) { // Assume the first byte initializes a map structure. The size is not used because it's not required for objects in JavaScript.
+    const byte = cbor[i];
 
     // IMPORTANT: NOT ALL TYPES ARE REPRESENTED IN THIS JUMP TABLE
     // Assumes that solc will only use the below types in the bytecode metadata
     let structure;
     if (byte >= 0x40 && byte <= 0x57) { // bytes
       const len = byte - 0x40;
-      const bytes = cbor.slice(0, len);
-      cbor = cbor.slice(len);
-      structure = new Uint8Array(bytes);
+      const bytes = cbor.slice(i + 1, i + len);
+      i += len;
+      structure = bytes;
     }
     else if (byte === 0x58) { // bytes_1n
-      const len = cbor.shift();
-      const bytes = cbor.slice(0, len);
-      cbor = cbor.slice(len);
-      structure = new Uint8Array(bytes);
+      const len = cbor[++i];
+      const bytes = cbor.slice(i + 1, i + 1 + len);
+      i += len;
+      structure = bytes;
     }
     else if (byte >= 0x60 && byte <= 0x77) { // UTF-8
       const len = byte - 0x60;
-      const bytes = cbor.slice(0, len);
-      cbor = cbor.slice(len);
-      structure = decoder.decode(new Uint8Array(bytes));
+      const bytes = cbor.slice(i + 1, i + 1 + len);
+      i += len;
+      structure = decoder.decode(bytes);
     }
 
     if (isKey) {
@@ -127,7 +122,7 @@ function decodeCBOR(cbor) {
 
 /**
  * Transform a SHA-256 hash into an IPFS CIDv0, which is a base58btc-encoded multihash.
- * @param {Array<number>} byteArray A byte array representing a SHA-256 hash.
+ * @param {Uint8Array} byteArray A byte array representing a SHA-256 hash.
  * @returns {string} An IPFS CIDv0 (starts with `Q`) for a SHA-256 hash.
  */
 function solcMultihashToCIDv0(byteArray) {
@@ -159,7 +154,7 @@ function solcMultihashToCIDv0(byteArray) {
 /**
  * Transform a SHA-256 hash into an IPFS CIDv1, which is a self-describing format that may encode many combinations of hash and content.
  * This function will base32-encode the hash.
- * @param {Array<number>} byteArray A byte array representing a SHA-256 hash.
+ * @param {Uint8Array} byteArray A byte array representing a SHA-256 hash.
  * @returns {string} An IPFS CIDv1 (starts with `b`) for a SHA-256 hash.
  */
 function solcMultihashToCIDv1(byteArray) {
@@ -173,7 +168,9 @@ function solcMultihashToCIDv1(byteArray) {
   // <multicodec-content-type>: 0x70 (dag-pb)
   // Reference: https://github.com/multiformats/cid
   const prefix = 'b';
-  byteArray = [0x01, 0x70, ...byteArray];
+  const cid = new Uint8Array(byteArray.length + 2);
+  cid.set([0x01, 0x70]);
+  cid.set(byteArray, 2);
 
   // Encoding logic is copied from https://github.com/multiformats/js-multiformats/
   const alphabet = 'abcdefghijklmnopqrstuvwxyz234567'; // RFC4648 base32
@@ -182,8 +179,8 @@ function solcMultihashToCIDv1(byteArray) {
   let out = '';
   let bits = 0;
   let buffer = 0;
-  for (let i = 0; i < byteArray.length; ++i) {
-    buffer = buffer << 8 | byteArray[i];
+  for (let i = 0; i < cid.length; ++i) {
+    buffer = buffer << 8 | cid[i];
     bits += 8;
     while (bits > bitsPerChar) {
       bits -= bitsPerChar;
