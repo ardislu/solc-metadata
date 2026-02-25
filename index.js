@@ -85,7 +85,7 @@ function decodeCBOR(cbor) {
     let structure;
     if (byte >= 0x40 && byte <= 0x57) { // bytes
       const len = byte - 0x40;
-      const bytes = cbor.slice(i + 1, i + len);
+      const bytes = cbor.slice(i + 1, i + 1 + len);
       i += len;
       structure = bytes;
     }
