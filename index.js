@@ -219,19 +219,17 @@ function calculateCID(metadata) {
  * @returns {Promise<Response>} `Promise` that resolves to a `Response` object.
  */
 function fetchCID(cid, ipfs) {
-  let response;
-  if (cid[0] === 'Q') { // v0
-    response = fetch(`${ipfs.origin}/ipfs/${cid}${ipfs.search}`);
+  // CID v0
+  if (cid[0] === 'Q') {
+    return fetch(`${ipfs.origin}/ipfs/${cid}${ipfs.search}`);
   }
-  else { // v1
-    if (ipfs.host.split('.')[0] === 'ipfs') {
-      response = fetch(`${ipfs.protocol}//${cid}.${ipfs.host}${ipfs.pathname}${ipfs.search}`);
-    }
-    else {
-      response = fetch(`${ipfs.protocol}//${cid}.ipfs.${ipfs.host}${ipfs.pathname}${ipfs.search}`);
-    }
+
+  // CID v1
+  if (ipfs.host.split('.')[0] === 'ipfs') { // Hostname already includes ipfs subdomain
+    return fetch(`${ipfs.protocol}//${cid}.${ipfs.host}${ipfs.pathname}${ipfs.search}`);
   }
-  return response;
+
+  return fetch(`${ipfs.protocol}//${cid}.ipfs.${ipfs.host}${ipfs.pathname}${ipfs.search}`);
 }
 
 export { fetchBytecode, detectLanguage, extractCBOR, decodeCBOR, calculateCID, fetchCID };
