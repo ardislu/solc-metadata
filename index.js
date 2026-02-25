@@ -1,6 +1,6 @@
 /**
  * Wrapper around the `fetch` API to simplify making an `eth_getCode` JSON-RPC call.
- * @param {string} address Hex address of the smart contract to retrieve the bytecode for (including `0x` prefix).
+ * @param {string} address Hex address of the smart contract to retrieve the bytecode for.
  * @param {string} rpc URL for a node that supports the standard Ethereum JSON-RPC method `eth_getCode`.
  * @returns {Promise<string|undefined>} `Promise` that will resolve to the `string` bytecode for the address, or `undefined` if the address is malformed.
  * @throws {TypeError} Will throw an error if the RPC responds with an HTTP error.
@@ -15,7 +15,7 @@ async function fetchBytecode(address, rpc) {
       id: '1',
       method: 'eth_getCode',
       params: [
-        address,
+        `0x${address.replace('0x', '')}`,
         'latest'
       ]
     })
@@ -27,7 +27,7 @@ async function fetchBytecode(address, rpc) {
 /**
  * Determine the smart contract language used to produce a smart contract by inspecting the initial bytes
  * of the runtime bytecode.
- * @param {string} bytecode Runtime bytecode of a smart contract.
+ * @param {string} bytecode Runtime bytecode of a smart contract in hex.
  * @returns {'solidity'|'vyper'|'unknown'} The smart contract language used to generate this smart contract.
  */
 function detectLanguage(bytecode) {
@@ -47,12 +47,14 @@ function detectLanguage(bytecode) {
 
 /**
  * Parse arbitrary EVM bytecode to extract the bytecode metadata from it.
- * @param {string} bytecode Raw EVM bytecode in hex (including `0x` prefix).
+ * @param {string} bytecode Raw EVM bytecode in hex.
  * @param {'solidity'|'vyper'} [lang=solidity] Smart contract language used to compile this bytecode.
  * @returns {Array<number>} Byte array of the CBOR-encoded bytecode metadata.
  * @throws {TypeError} Will throw an error if the bytecode is malformed.
  */
 function extractCBOR(bytecode, lang = 'solidity') {
+  bytecode = bytecode.replace('0x', '');
+
   // The length of the CBOR will always be stored as the last two bytes of the runtime bytecode
   const cborLen = parseInt(bytecode.slice(-4), 16);
 
