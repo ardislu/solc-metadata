@@ -32,9 +32,11 @@ async function fetchBytecode(address, rpc) {
  */
 function detectLanguage(bytecode) {
   const prefix = bytecode.replace('0x', '').substring(0, 10);
+  const viaIRPrefix = bytecode.replace('0x', '').substring(0, 12);
 
   // https://github.com/banteg/erigon-kv/blob/5584ada83c75b244e611641d100ccc647a7f6791/examples/compilers.py#L17
-  if (prefix === '6060604052' || prefix === '6080604052') {
+  // viaIRPrefix happens when optimizer viaIR=true
+  if (prefix === '6060604052' || prefix === '6080604052' || viaIRPrefix === '608080604052') {
     return 'solidity';
   }
   else if (prefix === '6004361015' || prefix === '341561000a') {
