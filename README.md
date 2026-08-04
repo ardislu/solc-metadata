@@ -4,7 +4,7 @@ This is the minimum JavaScript required to fetch, extract, decode, and use the [
 
 Similar to sourcify's metadata playground ([website](https://playground.sourcify.dev/), [GitHub](https://github.com/sourcifyeth/metadata-playground)) but reduced to the bare minimum code.
 
-> [!WARNING]<br>
+> [!WARNING]
 > This tool does not validate the source code retrieved from the bytecode metadata. You **MUST** recompile the source code and match it with the on-chain bytecode to confirm the metadata is correct.
 
 Code repository mirrors: [GitHub](https://github.com/ardislu/solc-metadata), [Codeberg](https://codeberg.org/ardislu/solc-metadata), [git.ardis.lu](https://git.ardis.lu/solc-metadata)
