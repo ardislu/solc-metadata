@@ -129,28 +129,15 @@ function decodeCBOR(cbor) {
  */
 function solcMultihashToCIDv0(byteArray) {
   // The IPFS v0 CID is the base58btc-encoded multihash, where the multihash is of the sha256 hash of the dag-pb representation of the metadata
-  const output = [];
-
-  // Base58 conversion logic is copied from https://github.com/cryptocoinjs/base-x
-  const base = 58;
-  const size = 46; // v0 CIDs are always 46 characters
-  let length = 0;
-  let pointer = 0;
-  while (pointer < byteArray.length) {
-    let carry = byteArray[pointer];
-    let i = 0;
-    for (let it1 = size - 1; (carry !== 0 || i < length) && (it1 !== -1); it1--, i++) {
-      carry += (256 * output[it1]) >>> 0;
-      output[it1] = (carry % base) >>> 0;
-      carry = (carry / base) >>> 0;
-    }
-    length = i;
-    pointer++;
-  }
-
   // The base58btc alphabet is from the Bitcoin client source code: https://github.com/bitcoin/bitcoin/blob/master/src/base58.cpp
   const alphabet = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-  return output.map(b => alphabet.charAt(b)).join('');
+  let value = BigInt(`0x${byteArray.toHex()}`);
+  const digits = [];
+  while (value > 0n) {
+    digits.unshift(alphabet[Number(value % 58n)]);
+    value /= 58n;
+  }
+  return digits.join('');
 }
 
 /**
